@@ -1,0 +1,618 @@
+-- Wispfloal Spawner Loading Screen - FULL GAME OVERLAY
+-- This will cover EVERYTHING in the Roblox game window
+-- Place in StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+local CoreGui = game:GetService("CoreGui")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Disable ALL possible UI elements during loading
+local function disableAllUI()
+    pcall(function()
+        -- Disable all core GUI elements
+        for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
+            StarterGui:SetCoreGuiEnabled(coreGuiType, false)
+        end
+    end)
+end
+
+local function enableAllUI()
+    pcall(function()
+        -- Re-enable all core GUI elements
+        for _, coreGuiType in pairs(Enum.CoreGuiType:GetEnumItems()) do
+            StarterGui:SetCoreGuiEnabled(coreGuiType, true)
+        end
+    end)
+end
+
+-- Extended loading stages
+local loadingStages = {
+    "🔥 Initializing Wispfloal Engine...",
+    "⚡ Checking system compatibility...",
+    "🌟 Loading core modules...",
+    "🔐 Establishing secure connection...",
+    "📦 Downloading entity database...",
+    "⚙️ Parsing spawn configurations...",
+    "🛡️ Verifying user permissions...",
+    "🎨 Loading texture assets...",
+    "🌊 Initializing physics engine...",
+    "🧠 Compiling spawn algorithms...",
+    "🔊 Loading sound effects...",
+    "💫 Configuring user interface...",
+    "🌐 Establishing server connection...",
+    "🔄 Synchronizing data...",
+    "👾 Loading entity models...",
+    "📍 Preparing spawn locations...",
+    "🤖 Initializing AI systems...",
+    "🎬 Loading animation data...",
+    "🎮 Configuring gameplay mechanics...",
+    "⚡ Optimizing performance...",
+    "✅ Running final checks...",
+    "🚀 Preparing user experience...",
+    "⭐ Almost ready...",
+    "🎉 Finalizing setup..."
+}
+
+-- Function to create animated particles
+local function createParticle(parent, color)
+    local particle = Instance.new("Frame")
+    particle.Size = UDim2.new(0, math.random(3, 8), 0, math.random(3, 8))
+    particle.Position = UDim2.new(math.random(0, 100) / 100, 0, math.random(0, 100) / 100, 0)
+    particle.BackgroundColor3 = color
+    particle.BorderSizePixel = 0
+    particle.Parent = parent
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = particle
+    
+    -- Animate particle
+    local moveInfo = TweenInfo.new(math.random(20, 40) / 10, Enum.EasingStyle.Linear)
+    local fadeTween = TweenService:Create(particle, moveInfo, {
+        Position = UDim2.new(math.random(0, 100) / 100, 0, math.random(0, 100) / 100, 0),
+        BackgroundTransparency = 1
+    })
+    fadeTween:Play()
+    
+    fadeTween.Completed:Connect(function()
+        particle:Destroy()
+    end)
+end
+
+-- Function to create the ultimate overlay loading screen
+local function createLoadingScreen()
+    -- Disable ALL UI elements
+    disableAllUI()
+    
+    -- Create multiple ScreenGuis to ensure maximum coverage
+    local screenGuis = {}
+    
+    -- Primary ScreenGui with maximum priority
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "WispfloalLoader_Primary"
+    screenGui.ResetOnSpawn = false
+    screenGui.IgnoreGuiInset = true
+    screenGui.DisplayOrder = 2147483647 -- Maximum possible value
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    screenGui.Parent = playerGui
+    table.insert(screenGuis, screenGui)
+    
+    -- Create backup ScreenGuis at different display orders
+    for i = 1, 5 do
+        local backupGui = Instance.new("ScreenGui")
+        backupGui.Name = "WispfloalLoader_Backup" .. i
+        backupGui.ResetOnSpawn = false
+        backupGui.IgnoreGuiInset = true
+        backupGui.DisplayOrder = 2147483647 - i
+        backupGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        backupGui.Parent = playerGui
+        table.insert(screenGuis, backupGui)
+    end
+
+    -- Main overlay frame that covers EVERYTHING
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Name = "MainOverlay"
+    mainFrame.Size = UDim2.new(1.5, 0, 1.5, 0) -- Slightly larger than screen
+    mainFrame.Position = UDim2.new(-0.25, 0, -0.25, 0) -- Positioned to cover extra area
+    mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.ZIndex = 2147483647 -- Maximum ZIndex
+    mainFrame.Parent = screenGui
+
+    -- Create multiple input blockers for maximum coverage
+    for i = 1, 10 do
+        local inputBlocker = Instance.new("TextButton")
+        inputBlocker.Name = "InputBlocker" .. i
+        inputBlocker.Size = UDim2.new(2, 0, 2, 0) -- Oversized
+        inputBlocker.Position = UDim2.new(-0.5, 0, -0.5, 0)
+        inputBlocker.BackgroundTransparency = 1
+        inputBlocker.Text = ""
+        inputBlocker.ZIndex = 2147483647 - i
+        inputBlocker.Modal = true -- Blocks all input
+        inputBlocker.Active = true
+        inputBlocker.Parent = mainFrame
+        
+        -- Make it absorb all clicks
+        inputBlocker.MouseButton1Click:Connect(function() end)
+        inputBlocker.MouseButton2Click:Connect(function() end)
+    end
+
+    -- Create backup frames in other ScreenGuis
+    for i, gui in ipairs(screenGuis) do
+        if i > 1 then -- Skip the first one (already has mainFrame)
+            local backupFrame = Instance.new("Frame")
+            backupFrame.Name = "BackupOverlay" .. i
+            backupFrame.Size = UDim2.new(1.5, 0, 1.5, 0)
+            backupFrame.Position = UDim2.new(-0.25, 0, -0.25, 0)
+            backupFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+            backupFrame.BorderSizePixel = 0
+            backupFrame.ZIndex = 2147483647
+            backupFrame.Parent = gui
+            
+            local backupBlocker = Instance.new("TextButton")
+            backupBlocker.Size = UDim2.new(2, 0, 2, 0)
+            backupBlocker.Position = UDim2.new(-0.5, 0, -0.5, 0)
+            backupBlocker.BackgroundTransparency = 1
+            backupBlocker.Text = ""
+            backupBlocker.Modal = true
+            backupBlocker.Active = true
+            backupBlocker.ZIndex = 2147483647
+            backupBlocker.Parent = backupFrame
+        end
+    end
+
+    -- Animated gradient background
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 0, 50)),
+        ColorSequenceKeypoint.new(0.3, Color3.fromRGB(0, 25, 75)),
+        ColorSequenceKeypoint.new(0.7, Color3.fromRGB(50, 0, 100)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(75, 25, 0))
+    }
+    gradient.Rotation = 0
+    gradient.Parent = mainFrame
+
+    -- Particle system background
+    local particleContainer = Instance.new("Frame")
+    particleContainer.Name = "ParticleContainer"
+    particleContainer.Size = UDim2.new(1, 0, 1, 0)
+    particleContainer.BackgroundTransparency = 1
+    particleContainer.ZIndex = 2147483646
+    particleContainer.Parent = mainFrame
+
+    -- Center Container for all content
+    local centerContainer = Instance.new("Frame")
+    centerContainer.Name = "CenterContainer"
+    centerContainer.Size = UDim2.new(0, 500, 0, 350)
+    centerContainer.Position = UDim2.new(0.5, -250, 0.5, -175)
+    centerContainer.BackgroundTransparency = 1
+    centerContainer.ZIndex = 2147483645
+    centerContainer.Parent = mainFrame
+
+    -- MASSIVE WARNING TEXT
+    local warningLabel = Instance.new("TextLabel")
+    warningLabel.Name = "WarningLabel"
+    warningLabel.Size = UDim2.new(1, 0, 0, 30)
+    warningLabel.Position = UDim2.new(0, 0, 0, -50)
+    warningLabel.BackgroundTransparency = 1
+    warningLabel.Text = "⚠️ FULL SCREEN LOADING MODE ACTIVE ⚠️"
+    warningLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+    warningLabel.TextScaled = true
+    warningLabel.Font = Enum.Font.GothamBold
+    warningLabel.TextStrokeTransparency = 0
+    warningLabel.TextStrokeColor3 = Color3.fromRGB(255, 0, 0)
+    warningLabel.ZIndex = 2147483645
+    warningLabel.Parent = centerContainer
+
+    -- Main Title with multiple effects
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Name = "TitleLabel"
+    titleLabel.Size = UDim2.new(1, 0, 0, 80)
+    titleLabel.Position = UDim2.new(0, 0, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "WISPFLOAL SPAWNER"
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextScaled = true
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextStrokeTransparency = 0
+    titleLabel.TextStrokeColor3 = Color3.fromRGB(0, 255, 255)
+    titleLabel.ZIndex = 2147483645
+    titleLabel.Parent = centerContainer
+
+    -- Title shadow effect
+    local titleShadow = Instance.new("TextLabel")
+    titleShadow.Name = "TitleShadow"
+    titleShadow.Size = titleLabel.Size
+    titleShadow.Position = UDim2.new(0, 5, 0, 5)
+    titleShadow.BackgroundTransparency = 1
+    titleShadow.Text = titleLabel.Text
+    titleShadow.TextColor3 = Color3.fromRGB(255, 0, 255)
+    titleShadow.TextScaled = true
+    titleShadow.Font = Enum.Font.GothamBold
+    titleShadow.TextTransparency = 0.7
+    titleShadow.ZIndex = titleLabel.ZIndex - 1
+    titleShadow.Parent = centerContainer
+
+    -- Subtitle with glow
+    local subtitleLabel = Instance.new("TextLabel")
+    subtitleLabel.Name = "SubtitleLabel"
+    subtitleLabel.Size = UDim2.new(1, 0, 0, 40)
+    subtitleLabel.Position = UDim2.new(0, 0, 0, 85)
+    subtitleLabel.BackgroundTransparency = 1
+    subtitleLabel.Text = "⚡ MAXIMUM OVERLAY MODE ACTIVATED ⚡"
+    subtitleLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+    subtitleLabel.TextScaled = true
+    subtitleLabel.Font = Enum.Font.GothamMedium
+    subtitleLabel.TextStrokeTransparency = 0.3
+    subtitleLabel.TextStrokeColor3 = Color3.fromRGB(255, 100, 0)
+    subtitleLabel.ZIndex = 2147483645
+    subtitleLabel.Parent = centerContainer
+
+    -- Loading container
+    local loadingContainer = Instance.new("Frame")
+    loadingContainer.Name = "LoadingContainer"
+    loadingContainer.Size = UDim2.new(1, -20, 0, 200)
+    loadingContainer.Position = UDim2.new(0, 10, 0, 140)
+    loadingContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
+    loadingContainer.BorderSizePixel = 0
+    loadingContainer.ZIndex = 2147483644
+    loadingContainer.Parent = centerContainer
+
+    local containerCorner = Instance.new("UICorner")
+    containerCorner.CornerRadius = UDim.new(0, 15)
+    containerCorner.Parent = loadingContainer
+
+    local containerStroke = Instance.new("UIStroke")
+    containerStroke.Color = Color3.fromRGB(0, 255, 255)
+    containerStroke.Thickness = 3
+    containerStroke.Parent = loadingContainer
+
+    -- Status background
+    local statusBg = Instance.new("Frame")
+    statusBg.Size = UDim2.new(1, -20, 0, 35)
+    statusBg.Position = UDim2.new(0, 10, 0, 10)
+    statusBg.BackgroundColor3 = Color3.fromRGB(50, 50, 100)
+    statusBg.BorderSizePixel = 0
+    statusBg.ZIndex = 2147483643
+    statusBg.Parent = loadingContainer
+
+    local statusBgCorner = Instance.new("UICorner")
+    statusBgCorner.CornerRadius = UDim.new(0, 8)
+    statusBgCorner.Parent = statusBg
+
+    local statusText = Instance.new("TextLabel")
+    statusText.Name = "StatusText"
+    statusText.Size = UDim2.new(1, -10, 1, 0)
+    statusText.Position = UDim2.new(0, 5, 0, 0)
+    statusText.BackgroundTransparency = 1
+    statusText.Text = loadingStages[1]
+    statusText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    statusText.TextScaled = true
+    statusText.Font = Enum.Font.GothamBold
+    statusText.TextXAlignment = Enum.TextXAlignment.Left
+    statusText.ZIndex = 2147483642
+    statusText.Parent = statusBg
+
+    -- Stage counter
+    local stageCounterBg = Instance.new("Frame")
+    stageCounterBg.Size = UDim2.new(0, 140, 0, 25)
+    stageCounterBg.Position = UDim2.new(1, -150, 0, 55)
+    stageCounterBg.BackgroundColor3 = Color3.fromRGB(100, 50, 150)
+    stageCounterBg.BorderSizePixel = 0
+    stageCounterBg.ZIndex = 2147483643
+    stageCounterBg.Parent = loadingContainer
+
+    local stageCounterCorner = Instance.new("UICorner")
+    stageCounterCorner.CornerRadius = UDim.new(0, 12)
+    stageCounterCorner.Parent = stageCounterBg
+
+    local stageCounter = Instance.new("TextLabel")
+    stageCounter.Name = "StageCounter"
+    stageCounter.Size = UDim2.new(1, 0, 1, 0)
+    stageCounter.Position = UDim2.new(0, 0, 0, 0)
+    stageCounter.BackgroundTransparency = 1
+    stageCounter.Text = "STAGE 1 OF " .. #loadingStages
+    stageCounter.TextColor3 = Color3.fromRGB(255, 255, 255)
+    stageCounter.TextScaled = true
+    stageCounter.Font = Enum.Font.GothamBold
+    stageCounter.ZIndex = 2147483642
+    stageCounter.Parent = stageCounterBg
+
+    -- Progress bar
+    local progressBg = Instance.new("Frame")
+    progressBg.Name = "ProgressBackground"
+    progressBg.Size = UDim2.new(1, -20, 0, 15)
+    progressBg.Position = UDim2.new(0, 10, 0, 90)
+    progressBg.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    progressBg.BorderSizePixel = 0
+    progressBg.ZIndex = 2147483643
+    progressBg.Parent = loadingContainer
+
+    local progressBgCorner = Instance.new("UICorner")
+    progressBgCorner.CornerRadius = UDim.new(0, 7)
+    progressBgCorner.Parent = progressBg
+
+    local progressFill = Instance.new("Frame")
+    progressFill.Name = "ProgressFill"
+    progressFill.Size = UDim2.new(0, 0, 1, 0)
+    progressFill.Position = UDim2.new(0, 0, 0, 0)
+    progressFill.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+    progressFill.BorderSizePixel = 0
+    progressFill.ZIndex = 2147483642
+    progressFill.Parent = progressBg
+
+    local progressFillCorner = Instance.new("UICorner")
+    progressFillCorner.CornerRadius = UDim.new(0, 7)
+    progressFillCorner.Parent = progressFill
+
+    local progressGradient = Instance.new("UIGradient")
+    progressGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 0))
+    }
+    progressGradient.Parent = progressFill
+
+    -- Percentage display
+    local percentBg = Instance.new("Frame")
+    percentBg.Size = UDim2.new(0, 80, 0, 30)
+    percentBg.Position = UDim2.new(0.5, -40, 0, 115)
+    percentBg.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
+    percentBg.BorderSizePixel = 0
+    percentBg.ZIndex = 2147483643
+    percentBg.Parent = loadingContainer
+
+    local percentBgCorner = Instance.new("UICorner")
+    percentBgCorner.CornerRadius = UDim.new(0, 15)
+    percentBgCorner.Parent = percentBg
+
+    local percentText = Instance.new("TextLabel")
+    percentText.Name = "PercentText"
+    percentText.Size = UDim2.new(1, 0, 1, 0)
+    percentText.Position = UDim2.new(0, 0, 0, 0)
+    percentText.BackgroundTransparency = 1
+    percentText.Text = "0%"
+    percentText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    percentText.TextScaled = true
+    percentText.Font = Enum.Font.GothamBold
+    percentText.ZIndex = 2147483642
+    percentText.Parent = percentBg
+
+    -- Time remaining
+    local timeBg = Instance.new("Frame")
+    timeBg.Size = UDim2.new(1, -20, 0, 30)
+    timeBg.Position = UDim2.new(0, 10, 0, 155)
+    timeBg.BackgroundColor3 = Color3.fromRGB(150, 0, 150)
+    timeBg.BorderSizePixel = 0
+    timeBg.ZIndex = 2147483643
+    timeBg.Parent = loadingContainer
+
+    local timeBgCorner = Instance.new("UICorner")
+    timeBgCorner.CornerRadius = UDim.new(0, 8)
+    timeBgCorner.Parent = timeBg
+
+    local timeText = Instance.new("TextLabel")
+    timeText.Name = "TimeText"
+    timeText.Size = UDim2.new(1, 0, 1, 0)
+    timeText.Position = UDim2.new(0, 0, 0, 0)
+    timeText.BackgroundTransparency = 1
+    timeText.Text = "⏰ Estimated time: 3 minutes"
+    timeText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    timeText.TextScaled = true
+    timeText.Font = Enum.Font.GothamMedium
+    timeText.ZIndex = 2147483642
+    timeText.Parent = timeBg
+
+    -- Loading animation variables
+    local currentProgress = 0
+    local currentStage = 1
+    local isLoading = true
+    local startTime = tick()
+
+    -- Update loading function
+    local function updateLoading()
+        if not isLoading then return end
+        
+        local stageProgress = 100 / #loadingStages
+        local targetProgress = math.min(currentStage * stageProgress, 100)
+        
+        -- Update status text
+        if statusText and statusText.Parent and currentStage <= #loadingStages then
+            statusText.Text = loadingStages[currentStage]
+            stageCounter.Text = "STAGE " .. currentStage .. " OF " .. #loadingStages
+            
+            -- Flash effects
+            local flashTween = TweenService:Create(statusBg, TweenInfo.new(0.2), {
+                BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+            })
+            flashTween:Play()
+            flashTween.Completed:Connect(function()
+                TweenService:Create(statusBg, TweenInfo.new(0.3), {
+                    BackgroundColor3 = Color3.fromRGB(50, 50, 100)
+                }):Play()
+            end)
+        end
+        
+        -- Update time remaining
+        if timeText and timeText.Parent then
+            local elapsed = tick() - startTime
+            local totalTime = 180
+            local remaining = math.max(0, totalTime - elapsed)
+            local minutes = math.floor(remaining / 60)
+            local seconds = math.floor(remaining % 60)
+            
+            if remaining > 0 then
+                timeText.Text = string.format("⏰ Time remaining: %d:%02d", minutes, seconds)
+            else
+                timeText.Text = "🚀 Almost complete..."
+            end
+        end
+        
+        -- Animate progress bar
+        local tweenInfo = TweenInfo.new(math.random(40, 60) / 10, Enum.EasingStyle.Quad)
+        
+        if progressFill and progressFill.Parent then
+            TweenService:Create(progressFill, tweenInfo, {
+                Size = UDim2.new(targetProgress / 100, 0, 1, 0)
+            }):Play()
+        end
+        
+        -- Update percentage
+        if percentText and percentText.Parent then
+            spawn(function()
+                local duration = tweenInfo.Time
+                local elapsed = 0
+                
+                while elapsed < duration and percentText and percentText.Parent do
+                    elapsed = elapsed + RunService.Heartbeat:Wait()
+                    local alpha = math.min(elapsed / duration, 1)
+                    local currentPercent = math.floor(currentProgress + (targetProgress - currentProgress) * alpha)
+                    percentText.Text = currentPercent .. "%"
+                end
+            end)
+        end
+        
+        currentProgress = targetProgress
+        currentStage = currentStage + 1
+    end
+
+    -- Particle generation
+    spawn(function()
+        while isLoading and particleContainer and particleContainer.Parent do
+            local colors = {
+                Color3.fromRGB(0, 255, 255),
+                Color3.fromRGB(255, 0, 255),
+                Color3.fromRGB(255, 255, 0),
+                Color3.fromRGB(255, 100, 255),
+                Color3.fromRGB(100, 255, 255)
+            }
+            createParticle(particleContainer, colors[math.random(#colors)])
+            wait(math.random(5, 15) / 100)
+        end
+    end)
+
+    -- Background gradient rotation
+    spawn(function()
+        while isLoading and gradient and gradient.Parent do
+            local rotateTween = TweenService:Create(gradient, TweenInfo.new(8, Enum.EasingStyle.Linear), {
+                Rotation = gradient.Rotation + 360
+            })
+            rotateTween:Play()
+            rotateTween.Completed:Wait()
+        end
+    end)
+
+    -- Title rainbow effect
+    spawn(function()
+        while isLoading and titleLabel and titleLabel.Parent do
+            local colors = {
+                Color3.fromRGB(255, 0, 0),
+                Color3.fromRGB(255, 125, 0),
+                Color3.fromRGB(255, 255, 0),
+                Color3.fromRGB(0, 255, 0),
+                Color3.fromRGB(0, 255, 255),
+                Color3.fromRGB(0, 0, 255),
+                Color3.fromRGB(255, 0, 255)
+            }
+            
+            for _, color in ipairs(colors) do
+                if not isLoading then break end
+                TweenService:Create(titleLabel, TweenInfo.new(0.5), {
+                    TextStrokeColor3 = color
+                }):Play()
+                wait(0.5)
+            end
+        end
+    end)
+
+    -- Warning text flashing
+    spawn(function()
+        while isLoading and warningLabel and warningLabel.Parent do
+            TweenService:Create(warningLabel, TweenInfo.new(0.5), {
+                TextTransparency = 0.5
+            }):Play()
+            wait(0.5)
+            TweenService:Create(warningLabel, TweenInfo.new(0.5), {
+                TextTransparency = 0
+            }):Play()
+            wait(0.5)
+        end
+    end)
+
+    -- Main loading sequence
+    spawn(function()
+        wait(2)
+        
+        for i = 1, #loadingStages do
+            if not isLoading then break end
+            
+            updateLoading()
+            
+            local delay = math.random(60, 100) / 10
+            wait(delay)
+        end
+        
+        -- Complete loading
+        if isLoading and statusText and statusText.Parent then
+            statusText.Text = "🎉 LOADING COMPLETE! MAXIMUM OVERLAY MODE ENDING! 🎉"
+            timeText.Text = "🚀 READY TO LAUNCH! 🚀"
+            
+            -- Epic finale flash
+            for i = 1, 10 do
+                mainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                wait(0.1)
+                mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+                wait(0.1)
+            end
+            
+            wait(2)
+            
+            -- Fade out all ScreenGuis
+            for _, gui in ipairs(screenGuis) do
+                if gui and gui.Parent then
+                    for _, child in pairs(gui:GetDescendants()) do
+                        if child:IsA("GuiObject") then
+                            TweenService:Create(child, TweenInfo.new(3), {
+                                BackgroundTransparency = 1,
+                                TextTransparency = 1
+                            }):Play()
+                        end
+                    end
+                end
+            end
+            
+            wait(3)
+            
+            -- Clean up
+            isLoading = false
+            enableAllUI()
+            
+            for _, gui in ipairs(screenGuis) do
+                if gui and gui.Parent then
+                    gui:Destroy()
+                end
+            end
+            
+            print("🎉 WISPFLOAL SPAWNER - MAXIMUM OVERLAY MODE COMPLETE! 🎉")
+        end
+    end)
+
+    -- Protection against removal
+    for _, gui in ipairs(screenGuis) do
+        gui.AncestryChanged:Connect(function()
+            if not gui.Parent and isLoading then
+                gui.Parent = playerGui
+            end
+        end)
+    end
+
+    return screenGuis
+end
+
+-- Execute the maximum overlay loading screen
+createLoadingScreen()
